@@ -10,8 +10,8 @@ struct Media {
 	SDL_Surface* keyright = nullptr;
 };
 
-const size_t screenWidth = 640;
-const size_t screenHeight = 480;
+const size_t screenWidth = 400;
+const size_t screenHeight = 400;
 
 SDL_Window* window = nullptr;
 SDL_Surface* surface = nullptr;
@@ -20,6 +20,7 @@ Media media;
 
 bool init();
 bool loadMedia();
+SDL_Surface* loadSurface(const char* path);
 void close();
 
 int main(int argc, char* args[]) {
@@ -34,6 +35,12 @@ int main(int argc, char* args[]) {
 
 	SDL_Event e;
 	bool quit = false;
+
+	SDL_Rect stretchRect {
+		0, 0,
+		::screenWidth,
+		::screenHeight
+	};
 	SDL_Surface* currentSurface = ::media.noactions;
 
 	while (quit == false) {
@@ -70,7 +77,7 @@ int main(int argc, char* args[]) {
 			}
 		}
 
-		SDL_BlitSurface(currentSurface, NULL, ::surface, NULL);
+		SDL_BlitSurfaceScaled(currentSurface, NULL, ::surface, &stretchRect);
 		SDL_UpdateWindowSurface(::window);
 	}
 
@@ -95,14 +102,25 @@ bool init() {
 }
 
 bool loadMedia() {
-	::media.noactions = SDL_LoadBMP("rsc/noactions.bmp");
-	::media.xaction = SDL_LoadBMP("rsc/xaction.bmp");
-	::media.keyup = SDL_LoadBMP("rsc/keyup.bmp");
-	::media.keydown = SDL_LoadBMP("rsc/keydown.bmp");
-	::media.keyleft = SDL_LoadBMP("rsc/keyleft.bmp");
-	::media.keyright = SDL_LoadBMP("rsc/keyright.bmp");
+	::media.noactions = loadSurface("rsc/noactions.bmp");
+	::media.xaction = loadSurface("rsc/xaction.bmp");
+	::media.keyup = loadSurface("rsc/keyup.bmp");
+	::media.keydown = loadSurface("rsc/keydown.bmp");
+	::media.keyleft = loadSurface("rsc/keyleft.bmp");
+	::media.keyright = loadSurface("rsc/keyright.bmp");
 	return ::media.noactions && ::media.xaction && ::media.keyup &&
 			::media.keydown && ::media.keyleft && ::media.keyright;
+}
+
+SDL_Surface* loadSurface(const char* path) {
+	SDL_Surface* const buffer = SDL_LoadBMP(path);
+	if (!buffer) {
+		return nullptr;
+	}
+	SDL_Surface* const surface = SDL_ConvertSurface(
+			buffer, ::surface->format);
+	SDL_DestroySurface(buffer);
+	return surface;
 }
 
 void close() {
