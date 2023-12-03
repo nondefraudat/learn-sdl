@@ -3,24 +3,27 @@
 #include <cstdio>
 
 struct Media {
-	SDL_Surface* noactions = nullptr;
-	SDL_Surface* xaction = nullptr;
-	SDL_Surface* keyup = nullptr;
-	SDL_Surface* keydown = nullptr;
-	SDL_Surface* keyleft = nullptr;
-	SDL_Surface* keyright = nullptr;
+	SDL_Texture* noactions = nullptr;
+	SDL_Texture* xaction = nullptr;
+	SDL_Texture* keyup = nullptr;
+	SDL_Texture* keydown = nullptr;
+	SDL_Texture* keyleft = nullptr;
+	SDL_Texture* keyright = nullptr;
+	SDL_Texture* example = nullptr;
 };
 
-const size_t screenWidth = 640;
-const size_t screenHeight = 480;
+const size_t screenWidth = 400;
+const size_t screenHeight = 400;
 
 SDL_Window* window = nullptr;
 SDL_Surface* surface = nullptr;
+SDL_Renderer* renderer = nullptr;
 
 Media media;
 
 bool init();
 SDL_Surface* loadSurface(const char* path);
+SDL_Texture* loadTexture(const char* path);
 bool loadMedia();
 void close();
 
@@ -37,13 +40,7 @@ int main(int argc, char* args[]) {
 	SDL_Event e;
 	bool quit = false;
 
-	SDL_Rect stretchRect {
-		0, 0,
-		::screenWidth,
-		::screenHeight
-	};
-	SDL_Surface* currentSurface = ::media.noactions;
-	SDL_Surface* pngSurface = loadSurface("rsc/example.png");
+	SDL_Texture* texture = ::media.noactions;
 
 	while (quit == false) {
 		while (SDL_PollEvent(&e)) {
@@ -53,39 +50,42 @@ int main(int argc, char* args[]) {
 			else if (e.type == SDL_EVENT_KEY_DOWN) {
 				switch (e.key.keysym.sym) {
 					case SDLK_UP: {
-						currentSurface = ::media.keyup;
+						texture = ::media.keyup;
 						break;
 					}
 					case SDLK_DOWN: {
-						currentSurface = ::media.keydown;
+						texture = ::media.keydown;
 						break;
 					}
 					case SDLK_LEFT: {
-						currentSurface = ::media.keyleft;
+						texture = ::media.keyleft;
 						break;
 					}
 					case SDLK_RIGHT: {
-						currentSurface = ::media.keyright;
+						texture = ::media.keyright;
 						break;
 					}
 					case SDLK_SPACE: {
-						currentSurface = pngSurface;
+						texture = ::media.example;
 						break;
 					}
 					default: {
-						currentSurface = ::media.xaction;
+						texture = ::media.xaction;
 						break;
 					}
 				}
 			}
 			else if (e.type == SDL_EVENT_KEY_UP) {
-				currentSurface = ::media.noactions;
+				texture = ::media.noactions;
 			}
 		}
 
-		SDL_BlitSurfaceScaled(currentSurface, NULL,
-				::surface, &stretchRect);
 		SDL_UpdateWindowSurface(::window);
+
+		SDL_RenderClear(::renderer);
+		SDL_RenderTexture(::renderer, texture, nullptr, nullptr);
+
+		SDL_RenderPresent(::renderer);
 	}
 
 	close();
@@ -102,6 +102,14 @@ bool init() {
 	if (!window) {
 		return false;
 	}
+
+	::renderer = SDL_CreateRenderer(::window,
+			nullptr, SDL_RENDERER_ACCELERATED);
+	if (!renderer) {
+		return false;
+	}
+
+	SDL_SetRenderDrawColor(::renderer, 255, 255, 255, 255);
 
 	const int imageFlags = IMG_INIT_PNG;
 	if (!(IMG_Init(imageFlags) & imageFlags)) {
@@ -124,26 +132,43 @@ SDL_Surface* loadSurface(const char* path) {
 	return surface;
 }
 
+SDL_Texture* loadTexture(const char* path) {
+	SDL_Surface* const buffer = loadSurface(path);
+	if (!buffer) {
+		return nullptr;
+	}
+	SDL_Texture* const texture = SDL_CreateTextureFromSurface(
+			::renderer, buffer);
+	SDL_DestroySurface(buffer);
+	return texture;
+}
+
 bool loadMedia() {
-	::media.noactions = loadSurface("rsc/noactions.bmp");
-	::media.xaction = loadSurface("rsc/xaction.bmp");
-	::media.keyup = loadSurface("rsc/keyup.bmp");
-	::media.keydown = loadSurface("rsc/keydown.bmp");
-	::media.keyleft = loadSurface("rsc/keyleft.bmp");
-	::media.keyright = loadSurface("rsc/keyright.bmp");
-	return ::media.noactions && ::media.xaction && ::media.keyup &&
-			::media.keydown && ::media.keyleft && ::media.keyright;
+	::media.noactions = loadTexture("rsc/noactions.bmp");
+	::media.xaction = loadTexture("rsc/xaction.bmp");
+	::media.keyup = loadTexture("rsc/keyup.bmp");
+	::media.keydown = loadTexture("rsc/keydown.bmp");
+	::media.keyleft = loadTexture("rsc/keyleft.bmp");
+	::media.keyright = loadTexture("rsc/keyright.bmp");
+	::media.example = loadTexture("rsc/example.png");
+	return ::media.noactions && ::media.xaction &&
+			::media.keyup && ::media.keydown &&
+			::media.keyleft && ::media.keyright && ::media.example;
 }
 
 void close() {
-	SDL_DestroySurface(::media.noactions);
-	SDL_DestroySurface(::media.xaction);
-	SDL_DestroySurface(::media.keyup);
-	SDL_DestroySurface(::media.keydown);
-	SDL_DestroySurface(::media.keyleft);
-	SDL_DestroySurface(::media.keyright);
+	SDL_DestroyTexture(::media.noactions);
+	SDL_DestroyTexture(::media.xaction);
+	SDL_DestroyTexture(::media.keyup);
+	SDL_DestroyTexture(::media.keydown);
+	SDL_DestroyTexture(::media.keyleft);
+	SDL_DestroyTexture(::media.keyright);
+	SDL_DestroyTexture(::media.example);
 
+	SDL_DestroyRenderer(::renderer);
 	SDL_DestroyWindow(::window);
+
+	IMG_Quit();
 	SDL_Quit();
 }
 
