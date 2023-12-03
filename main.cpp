@@ -21,9 +21,6 @@ int main(int argc, char* args[]) {
 		return NULL;
 	}
 
-	SDL_BlitSurface(::media, NULL, ::surface, NULL);
-	SDL_UpdateWindowSurface(::window);
-
 	SDL_Event e;
 	bool quit = false;
 	while (quit == false) {
@@ -31,6 +28,9 @@ int main(int argc, char* args[]) {
 			if (e.type == SDL_EVENT_QUIT)
 				quit = true;
 		}
+
+		SDL_BlitSurface(::media, NULL, ::surface, NULL);
+		SDL_UpdateWindowSurface(::window);
 	}
 
 	close();
