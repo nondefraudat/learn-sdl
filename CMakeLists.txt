@@ -14,3 +14,5 @@ add_custom_command(TARGET ${PROJECT_NAME}
         $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
         COMMAND_EXPAND_LISTS)
+
+configure_file("helloworld.bmp" ${CMAKE_BINARY_DIR} COPYONLY)
