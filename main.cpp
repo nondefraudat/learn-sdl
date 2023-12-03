@@ -157,8 +157,22 @@ bool loadMedia() {
 void drawTexture(SDL_Texture* texture) {
 	//SDL_UpdateWindowSurface(::window);
 
+	// Save prev viewport
+	SDL_Rect rect;
+	SDL_GetRenderViewport(::renderer, &rect);
+
+	const SDL_Rect viewport {
+		::screenWidth - 100,
+		::screenHeight - 100,
+		100, 100
+	};
+
+	SDL_SetRenderViewport(::renderer, &viewport);
 	SDL_RenderClear(::renderer);
 	SDL_RenderTexture(::renderer, texture, nullptr, nullptr);
+
+	// Return prev viewport
+	SDL_SetRenderViewport(::renderer, &rect);
 }
 
 void drawGeoms() {
