@@ -1,4 +1,5 @@
 #include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 #include <cstdio>
 
 struct Media {
@@ -10,8 +11,8 @@ struct Media {
 	SDL_Surface* keyright = nullptr;
 };
 
-const size_t screenWidth = 400;
-const size_t screenHeight = 400;
+const size_t screenWidth = 640;
+const size_t screenHeight = 480;
 
 SDL_Window* window = nullptr;
 SDL_Surface* surface = nullptr;
@@ -19,8 +20,8 @@ SDL_Surface* surface = nullptr;
 Media media;
 
 bool init();
-bool loadMedia();
 SDL_Surface* loadSurface(const char* path);
+bool loadMedia();
 void close();
 
 int main(int argc, char* args[]) {
@@ -42,6 +43,7 @@ int main(int argc, char* args[]) {
 		::screenHeight
 	};
 	SDL_Surface* currentSurface = ::media.noactions;
+	SDL_Surface* pngSurface = loadSurface("rsc/example.png");
 
 	while (quit == false) {
 		while (SDL_PollEvent(&e)) {
@@ -66,6 +68,10 @@ int main(int argc, char* args[]) {
 						currentSurface = ::media.keyright;
 						break;
 					}
+					case SDLK_SPACE: {
+						currentSurface = pngSurface;
+						break;
+					}
 					default: {
 						currentSurface = ::media.xaction;
 						break;
@@ -77,7 +83,8 @@ int main(int argc, char* args[]) {
 			}
 		}
 
-		SDL_BlitSurfaceScaled(currentSurface, NULL, ::surface, &stretchRect);
+		SDL_BlitSurfaceScaled(currentSurface, NULL,
+				::surface, &stretchRect);
 		SDL_UpdateWindowSurface(::window);
 	}
 
@@ -96,9 +103,25 @@ bool init() {
 		return false;
 	}
 
+	const int imageFlags = IMG_INIT_PNG;
+	if (!(IMG_Init(imageFlags) & imageFlags)) {
+		return false;
+	}
+
 	::surface = SDL_GetWindowSurface(::window);
 
 	return true;
+}
+
+SDL_Surface* loadSurface(const char* path) {
+	SDL_Surface* const buffer = IMG_Load(path);
+	if (!buffer) {
+		return nullptr;
+	}
+	SDL_Surface* const surface = SDL_ConvertSurface(
+		buffer, ::surface->format);
+	SDL_DestroySurface(buffer);
+	return surface;
 }
 
 bool loadMedia() {
@@ -110,17 +133,6 @@ bool loadMedia() {
 	::media.keyright = loadSurface("rsc/keyright.bmp");
 	return ::media.noactions && ::media.xaction && ::media.keyup &&
 			::media.keydown && ::media.keyleft && ::media.keyright;
-}
-
-SDL_Surface* loadSurface(const char* path) {
-	SDL_Surface* const buffer = SDL_LoadBMP(path);
-	if (!buffer) {
-		return nullptr;
-	}
-	SDL_Surface* const surface = SDL_ConvertSurface(
-			buffer, ::surface->format);
-	SDL_DestroySurface(buffer);
-	return surface;
 }
 
 void close() {

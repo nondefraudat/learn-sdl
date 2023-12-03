@@ -2,12 +2,15 @@ cmake_minimum_required(VERSION 3.14)
 
 project("learn-sdl")
 
-add_subdirectory("SDL")
+add_subdirectory("deps/SDL")
+add_subdirectory("deps/SDL_Image")
 
 file(GLOB PROJECT_SOURCES "*.*pp")
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
-target_include_directories(${PROJECT_NAME} PRIVATE "SDL/include")
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
+target_include_directories(${PROJECT_NAME} PRIVATE
+        "deps/SDL/include" "deps/SDL_Image/include")
+target_link_libraries(${PROJECT_NAME} PRIVATE
+        SDL3::SDL3 SDL3_image::SDL3_image)
 
 add_custom_command(TARGET ${PROJECT_NAME}
         POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
