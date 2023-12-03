@@ -15,4 +15,8 @@ add_custom_command(TARGET ${PROJECT_NAME}
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
         COMMAND_EXPAND_LISTS)
 
-configure_file("helloworld.bmp" ${CMAKE_BINARY_DIR} COPYONLY)
+file(GLOB PROJECT_RESOURCES "rsc/*")
+foreach (RES_PATH ${PROJECT_RESOURCES})
+    get_filename_component(RES_NAME ${RES_PATH} NAME)
+    configure_file(${RES_PATH} "${CMAKE_BINARY_DIR}/rsc/${RES_NAME}" COPYONLY)
+endforeach ()
