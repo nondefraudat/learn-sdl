@@ -10,6 +10,7 @@ struct Media {
 	SDL_Texture* keyleft = nullptr;
 	SDL_Texture* keyright = nullptr;
 	SDL_Texture* example = nullptr;
+	SDL_Texture* what = nullptr;
 };
 
 const size_t screenWidth = 400;
@@ -26,6 +27,7 @@ SDL_Surface* loadSurface(const char* path);
 SDL_Texture* loadTexture(const char* path);
 bool loadMedia();
 void drawTexture(SDL_Texture* texture);
+void drawWhat();
 void drawGeoms();
 void close();
 
@@ -81,6 +83,8 @@ int main(int argc, char* args[]) {
 				texture = ::media.noactions;
 			}
 		}
+		SDL_RenderClear(::renderer);
+		drawWhat();
 		drawTexture(texture);
 		drawGeoms();
 		SDL_RenderPresent(::renderer);
@@ -124,8 +128,10 @@ SDL_Surface* loadSurface(const char* path) {
 	if (!buffer) {
 		return nullptr;
 	}
+	SDL_SetSurfaceColorKey(buffer,
+			SDL_TRUE, SDL_MapRGB(buffer->format, 29, 255, 0));
 	SDL_Surface* const surface = SDL_ConvertSurface(
-		buffer, ::surface->format);
+			buffer, ::surface->format);
 	SDL_DestroySurface(buffer);
 	return surface;
 }
@@ -155,21 +161,56 @@ bool loadMedia() {
 }
 
 void drawTexture(SDL_Texture* texture) {
+	static const SDL_Rect viewport{
+		::screenWidth - 200,
+		::screenHeight - 200,
+		200, 200
+	};
+
 	//SDL_UpdateWindowSurface(::window);
 
 	// Save prev viewport
 	SDL_Rect rect;
 	SDL_GetRenderViewport(::renderer, &rect);
 
-	const SDL_Rect viewport {
-		::screenWidth - 100,
-		::screenHeight - 100,
+	SDL_SetRenderViewport(::renderer, &viewport);
+	SDL_RenderTexture(::renderer, texture, nullptr, nullptr);
+
+	// Return prev viewport
+	SDL_SetRenderViewport(::renderer, &rect);
+}
+
+void drawWhat() {
+	static const SDL_Rect viewport {
+		::screenWidth - 100, 0,
 		100, 100
 	};
+	
+	if (!::media.what) {
+		SDL_Surface* buffer = loadSurface("rsc/what.bmp");
+
+		if (!buffer) {
+			return;
+		}
+
+		SDL_SetSurfaceColorKey(buffer, SDL_TRUE,
+				SDL_MapRGB(buffer->format, 29, 255, 0));
+
+		::media.what = SDL_CreateTextureFromSurface(::renderer, buffer);
+
+		SDL_DestroySurface(buffer);
+
+		if (!::media.what) {
+			return;
+		}
+	}
+
+	// Save prev viewport
+	SDL_Rect rect;
+	SDL_GetRenderViewport(::renderer, &rect);
 
 	SDL_SetRenderViewport(::renderer, &viewport);
-	SDL_RenderClear(::renderer);
-	SDL_RenderTexture(::renderer, texture, nullptr, nullptr);
+	SDL_RenderTexture(::renderer, ::media.what, nullptr, nullptr);
 
 	// Return prev viewport
 	SDL_SetRenderViewport(::renderer, &rect);
@@ -213,6 +254,7 @@ void close() {
 	SDL_DestroyTexture(::media.keyleft);
 	SDL_DestroyTexture(::media.keyright);
 	SDL_DestroyTexture(::media.example);
+	SDL_DestroyTexture(::media.what);
 
 	SDL_DestroyRenderer(::renderer);
 	SDL_DestroyWindow(::window);
