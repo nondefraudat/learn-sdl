@@ -25,6 +25,8 @@ bool init();
 SDL_Surface* loadSurface(const char* path);
 SDL_Texture* loadTexture(const char* path);
 bool loadMedia();
+void drawTexture(SDL_Texture* texture);
+void drawGeoms();
 void close();
 
 int main(int argc, char* args[]) {
@@ -79,12 +81,8 @@ int main(int argc, char* args[]) {
 				texture = ::media.noactions;
 			}
 		}
-
-		SDL_UpdateWindowSurface(::window);
-
-		SDL_RenderClear(::renderer);
-		SDL_RenderTexture(::renderer, texture, nullptr, nullptr);
-
+		drawTexture(texture);
+		drawGeoms();
 		SDL_RenderPresent(::renderer);
 	}
 
@@ -154,6 +152,43 @@ bool loadMedia() {
 	return ::media.noactions && ::media.xaction &&
 			::media.keyup && ::media.keydown &&
 			::media.keyleft && ::media.keyright && ::media.example;
+}
+
+void drawTexture(SDL_Texture* texture) {
+	//SDL_UpdateWindowSurface(::window);
+
+	SDL_RenderClear(::renderer);
+	SDL_RenderTexture(::renderer, texture, nullptr, nullptr);
+}
+
+void drawGeoms() {
+	static const SDL_FRect fillRect { 10, 10, 100, 100 };
+	static const SDL_FRect rect { 50, 10, 100, 10 };
+	
+	// Save prev color;
+	unsigned char r, g, b, a;
+	SDL_GetRenderDrawColor(::renderer, &r, &g, &b, &a);
+
+	SDL_SetRenderDrawColor(::renderer, 255, 0, 0, 255);
+	SDL_RenderFillRect(::renderer, &fillRect);
+
+	SDL_SetRenderDrawColor(::renderer, 0, 255, 0, 255);
+	SDL_RenderRect(::renderer, &rect);
+
+	SDL_SetRenderDrawColor(::renderer, 0, 0, 255, 255);
+	SDL_RenderLine(::renderer, 0, 0, ::screenWidth, ::screenHeight);
+
+	SDL_SetRenderDrawColor(::renderer, 255, 0, 255, 255);
+	// Dashed line
+	for (size_t i = ::screenWidth, j = 0;
+		j < ::screenHeight; i -= 6, j += 6) {
+		SDL_RenderPoint(::renderer, i, j);
+		SDL_RenderPoint(::renderer, i - 1, j + 1);
+		SDL_RenderPoint(::renderer, i - 2, j + 2);
+	}
+
+	// Return prev color;
+	SDL_SetRenderDrawColor(::renderer, r, g, b, a);
 }
 
 void close() {
