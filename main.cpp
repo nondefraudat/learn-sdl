@@ -33,12 +33,13 @@ void close();
 
 int main(int argc, char* args[]) {
 	if (!init()) {
-		return NULL;
+		auto e = SDL_GetError();
+		return 0;
 	}
 
 	if (!loadMedia()) {
 		auto e = SDL_GetError();
-		return NULL;
+		return 0;
 	}
 
 	SDL_Event e;
@@ -91,7 +92,7 @@ int main(int argc, char* args[]) {
 	}
 
 	close();
-	return NULL;
+	return 0;
 }
 
 bool init() {
