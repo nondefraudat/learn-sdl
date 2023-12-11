@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project("learn-sdl")
+project("sdl-samples")
 
 add_subdirectory("deps/SDL")
 add_subdirectory("deps/SDL_image")
