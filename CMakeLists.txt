@@ -11,6 +11,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         "deps/SDL/include" "deps/SDL_image/include")
 target_link_libraries(${PROJECT_NAME} PRIVATE
         SDL3::SDL3 SDL3_image::SDL3_image)
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 14)
 
 if (WIN32)
         add_custom_command(TARGET ${PROJECT_NAME}
