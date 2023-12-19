@@ -5,7 +5,7 @@ project("sdl-samples")
 add_subdirectory("deps/SDL")
 add_subdirectory("deps/SDL_image")
 
-file(GLOB PROJECT_SOURCES "*.*pp")
+file(GLOB PROJECT_SOURCES "src/*")
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE
         "deps/SDL/include" "deps/SDL_image/include")
