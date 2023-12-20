@@ -78,7 +78,7 @@ bool App::init() noexcept {
 	if (!renderer) {
 		return false;
 	}
-	SDL_SetRenderDrawColor(renderer.get(), 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(renderer.get(), 0, 0, 255, 255);
 	needInit = true;
 	return true;
 }
