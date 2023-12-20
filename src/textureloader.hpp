@@ -3,8 +3,6 @@
 #include "exchanges.hpp"
 #include <string>
 
-using Texture = std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)>;
-
 class TextureLoader {
 	TextureLoader() noexcept;
 

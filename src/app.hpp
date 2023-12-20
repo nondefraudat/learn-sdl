@@ -25,4 +25,5 @@ private:
 	Renderer renderer;
 
 	void eventLoop() noexcept;
+	void updateView() noexcept;
 };

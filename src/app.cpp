@@ -1,5 +1,6 @@
 #include "app.hpp"
 #include "textureloader.hpp"
+#include <cmath>
 
 App::App() noexcept : width(640), height(480),
 		window(nullptr, SDL_DestroyWindow),
@@ -36,6 +37,24 @@ int App::exec() noexcept {
 	return 0;
 }
 
+void App::updateView() noexcept {
+	// Test actions
+	
+	static const SDL_Rect viewPort = {
+		std::round(.05*width),
+		std::round(.05*height),
+		std::round(.9*width),
+		std::round(.9*height)
+	};
+	static Texture texture = TextureLoader::getInstance()
+			.load("rsc/example.png", renderer);
+
+	SDL_RenderClear(renderer.get());
+	SDL_SetRenderViewport(renderer.get(), &viewPort);
+	SDL_RenderTexture(renderer.get(), texture.get(), nullptr, nullptr);
+	SDL_RenderPresent(renderer.get());
+}
+
 void App::eventLoop() noexcept {
 	SDL_Event e;
 	bool quit = false;
@@ -45,8 +64,7 @@ void App::eventLoop() noexcept {
 				quit = true;
 			}
 		}
-		SDL_RenderClear(renderer.get());
-		SDL_RenderPresent(renderer.get());
+		updateView();
 	}
 }
 
