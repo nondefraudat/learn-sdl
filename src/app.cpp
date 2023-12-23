@@ -41,10 +41,9 @@ void App::updateView() noexcept {
 	// Test actions
 	
 	static const SDL_Rect viewPort = {
-		std::round(.05*height),
-		std::round(.05*height),
-		std::round(width - .1*height),
-		std::round(.9*height)
+		0, 0,
+		std::round(.5*width),
+		std::round(.5*height)
 	};
 	static Texture texture = TextureLoader::getInstance()
 			.load("rsc/example.png", renderer);
