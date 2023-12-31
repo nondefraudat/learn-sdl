@@ -42,15 +42,16 @@ void App::updateView() noexcept {
 	
 	static const SDL_Rect viewPort = {
 		0, 0,
-		std::round(.5*width),
-		std::round(.5*height)
+		static_cast<int>(std::round(.5*width)),
+		static_cast<int>(std::round(.5*height))
 	};
 	static Texture texture = TextureLoader::getInstance()
 			.load("rsc/example.png", renderer);
 
 	SDL_RenderClear(renderer.get());
 	SDL_SetRenderViewport(renderer.get(), &viewPort);
-	SDL_RenderTexture(renderer.get(), texture.get(), nullptr, nullptr);
+	texture.render(renderer.get());
+	// SDL_RenderTexture(renderer.get(), texture.get(), nullptr, nullptr);
 	SDL_RenderPresent(renderer.get());
 }
 

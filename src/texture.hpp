@@ -4,7 +4,7 @@
 #include <memory>
 
 class Texture {
-    std::unique_ptr<SDL_Texture> raw;
+    std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)> raw;
 public:
     Texture(decltype(raw)&& raw) noexcept;
     void render(SDL_Renderer* const renderer) const noexcept;

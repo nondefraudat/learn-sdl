@@ -18,12 +18,13 @@ TextureLoader& TextureLoader::getInstance() noexcept {
 
 Texture TextureLoader::load(const std::string& path,
 		const Renderer& renderer) const noexcept {
-	Texture texture(nullptr, SDL_DestroyTexture);
+	auto texture  = std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)>(
+		nullptr, SDL_DestroyTexture);
 	Surface surface(IMG_Load(path.c_str()), SDL_DestroySurface);
 	if (!surface) {
 		return texture;
 	}
 	texture.reset(
 			SDL_CreateTextureFromSurface(renderer.get(), surface.get()));
-	return texture;
+	return Texture(std::move(texture));
 }

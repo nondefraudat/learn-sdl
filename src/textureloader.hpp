@@ -1,7 +1,9 @@
 #pragma once
 
 #include "exchanges.hpp"
+#include "texture.hpp"
 #include <string>
+#include <memory>
 
 class TextureLoader {
 	TextureLoader() noexcept;
