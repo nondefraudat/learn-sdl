@@ -50,7 +50,7 @@ void App::updateView() noexcept {
 
 	SDL_RenderClear(renderer.get());
 	SDL_SetRenderViewport(renderer.get(), &viewPort);
-	texture.render(renderer.get());
+	texture.render(renderer);
 	// SDL_RenderTexture(renderer.get(), texture.get(), nullptr, nullptr);
 	SDL_RenderPresent(renderer.get());
 }
